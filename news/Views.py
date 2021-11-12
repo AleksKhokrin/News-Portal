@@ -1,100 +1,89 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
-from django.core.paginator import Paginator 
-from django.contrib.auth.models import User
-from datetime import datetime
-from .models import Author, Category, Post, PostCategory, Comment
-from .filters import PostFilter   
-from .forms import PostForm 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.shortcuts import render, reverse, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required
 
-class MyView(PermissionRequiredMixin, View):
- permission_required = ('<app>.<action>_<model>',
-                           '<app>.<action>_<model>')
-class AddProduct(PermissionRequiredMixin, CreateView):
-     permission_required = ('shop.add_product', )
-   
-class ProtectedView(LoginRequiredMixin, TemplateView):
-     template_name = 'protected_page.html'
+from .forms import PostForm
+from .models import Post, Category
+from .filters import PostFilter
 
-class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    template_name = 'news/post_create.html'
-    permission_required = ('news.change_post',)
+
+class NewsList(ListView):
+    model = Post
+    template_name = 'news_list.html'
+    context_object_name = 'news'
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+        return context
+
+
+class NewsDetail(DetailView):
+    template_name = 'news_detail.html'
+    queryset = Post.objects.all()
+
+
+class Search(ListView):
+    model = Post
+    template_name = 'search.html'
+    context_object_name = 'news'
+    ordering = ['-date_creation']
+    paginate_by = 2  
+
+    def get_context_data(self, **kwargs):  
+        context = super().get_context_data(**kwargs)
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())  # вписываем наш
+               return context
+
+
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
+    template_name = 'news_add.html'
     form_class = PostForm
+    success_url = '/news/'
 
-      def get_object(self, **kwargs):
+
+class NewsUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
+    template_name = 'news_add.html'
+    form_class = PostForm
+    success_url = '/news/'
+
+    def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
 
 
-
-class PostsList(ListView):
-    model = Post  
-    template_name = 'news.html'  
-    context_object_name = 'news'  
-    ordering = ['-pubDate']  
-    paginate_by = 10  
-
-
-       def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['time_now'] = datetime.utcnow()  
-        context['news_list'] = Post.objects.all()  
-        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
-        return context
-
-class PostDetailView(DetailView):
-    template_name = 'news/post_detail.html'
-    queryset = Post.objects.all()
-
-
-
-class PostCreateView(PermissionRequiredMixin, CreateView):
-    template_name = 'news/post_create.html'
-    permission_required = ('news.add_post',)
-    form_class = PostForm  
-
-
-
-class PostDeleteView(PermissionRequiredMixin, DeleteView):
-    template_name = 'news/post_delete.html'
-    permission_required = ('news.delete_post',)
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.change_post',)
+    template_name = 'news_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/'
 
 
-
-class SearchList(ListView):
-    model = Post
-    template_name = 'news/news_search.html'
-    context_object_name = 'news'
-    ordering = ['-pubDate']
-    paginate_by = 10  
-
-    def get_filter(self):
-        return PostFilter(self.request.GET, queryset=super().get_queryset())
-
-    def get_queryset(self):
-        return self.get_filter().qs
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['time_now'] = datetime.utcnow()  
-        context['news_list'] = Post.objects.all()  
-        context['filter'] = self.get_filter()
-        context['categories'] = Category.objects.all()
-        return context
+class CategoryView(ListView):
+    model = Category
+    template_name = 'subscribes.html'
+    context_object_name = 'category'
+    queryset = Category.objects.all()
+    paginate_by = 10
 
 
+@login_required
+def subscribe_me(request, cat_id):
+    user = request.user
+    category = Category.objects.get(pk=cat_id)
+    if request.user not in category.subscribers.all():
+        category.subscribers.add(user)
+    return redirect('/news/categories/')
 
- class PostDetail(DetailView):
-     model = Post  
-     template_name = 'new.html'  
-     context_object_name = 'new'  
 
-     def get_context_data(self, **kwargs):
-         context = super().get_context_data(**kwargs)
-         context['time_now'] = datetime.utcnow() 
-         return context
+@login_required
+def unsubscribe_me(request, cat_id):
+    user = request.user
+    category = Category.objects.get(pk=cat_id)
+    if request.user in category.subscribers.all():
+        category.subscribers.remove(user)
+    return redirect('/news/categories/')
