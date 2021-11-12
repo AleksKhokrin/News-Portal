@@ -1,57 +1,55 @@
-import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
 
 class Author(models.Model):
-    authorUser = models.OneToOneField(User, on_delete=models.CASCADE)
-    authorRating = models.SmallIntegerField("рейтинг автора", default=0)
+    author_user = models.OneToOneField(User, on_delete=models.CASCADE)
+    rating_author = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        
-        return f'{self.authorUser.username}'
+        return str(self.author_user)
 
     def update_rating(self):
-        postRat = self.post_set.aggregate(postRating=Sum('rating'))
-        pRat = 0
-        pRat += postRat.get('postRating')
+        post_rat = self.post_set.all().aggregate(postRating=Sum('rating'))
+        p_rat = 0
+        p_rat += post_rat.get('postRating')
 
-        commentRat = self.authorUser.comment_set.aggregate(commentRating=Sum('rating'))
-        cRat = 0
-        cRat += commentRat.get('commentRating')
+        comment_rat = self.author_user.comment_set.all().aggregate(commentRating=Sum('rating'))
+        c_rat = 0
+        c_rat += comment_rat.get('commentRating')
 
-        self.authorRating = pRat * 3 + cRat
+        self.rating_author = p_rat * 3 + c_rat
         self.save()
 
 
 class Category(models.Model):
-    categoryName = models.CharField('Topic', max_length=64, unique=True)
+    name = models.CharField(max_length=64, unique=True)
+    subscribers = models.ManyToManyField(User)
 
     def __str__(self):
-        
-        return f'{self.categoryName.title()}'
+        return str(self.name)
 
 
 class Post(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-
+    author_us = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='news',)
     NEWS = 'NW'
     ARTICLE = 'AR'
-    CATEGORIES = [
+    CATEGORY_CHOICES = (
         (NEWS, 'Новость'),
-        (ARTICLE, 'Статья')
-    ]
-    categoryType = models.CharField(max_length=2,
-                                     choices=CATEGORIES,
-                                     default=ARTICLE)
-    pubDate = models.DateTimeField('Publication date ', auto_now_add=True)
-    postCategory = models.ManyToManyField(Category, through='postCategory')
-    postTitle = models.CharField('Title ', max_length=128)
-    postText = models.TextField('Text')
-    rating = models.SmallIntegerField("рейтинг статьи/новости", default=0)
+        (ARTICLE, 'Статья'),
+    )
 
-    
+    category_type = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
+    date_creation = models.DateTimeField(auto_now_add=True)
+    post_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='news',)
+    title = models.CharField(max_length=128)
+    text = models.TextField()
+    rating = models.SmallIntegerField(default=0)
+
+    def __str__(self):
+        return str(self.title)
+
     def like(self):
         self.rating += 1
         self.save()
@@ -60,42 +58,29 @@ class Post(models.Model):
         self.rating -= 1
         self.save()
 
-   
     def preview(self):
-        return f'{self.postText[:124]} ...'
-
-    def __str__(self):
-        
-        return f'{self.postTitle}. {self.postText[:124]} ...'
+        return self.text[0:123] + '...'
 
     def get_absolute_url(self):
-        
         return f'/news/{self.id}'
 
-
-class PostCategory(models.Model):
-    postThrough = models.ForeignKey(Post, on_delete=models.CASCADE)
-    categoryThrough = models.ForeignKey(Category, on_delete=models.CASCADE)
-
-    def __str__(self):
-       
-        return f'{self.postThrough}. {self.categoryThrough}'
-
+    class Meta:
+        ordering = ['-date_creation']
 
 
 class Comment(models.Model):
-    commentPost = models.ForeignKey(Post, on_delete=models.CASCADE)
-    commentUser = models.ForeignKey(User, on_delete=models.CASCADE)
-    commentText = models.CharField('текст комментария', max_length=200)
-    pubDate = models.DateTimeField('дата и время публикации комментария', auto_now_add=True)
-    rating = models.SmallIntegerField("рейтинг комментария", default=0)
+    comment_post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    date_creation = models.DateTimeField(auto_now_add=True)
+    rating = models.SmallIntegerField(default=0)
 
-    
     def __str__(self):
-        
-        return f'{self.commentUser.username}'
+        try:
+            return self.comment_post.author.author_user.username
+        except:
+            return self.comment_user.username
 
-   
     def like(self):
         self.rating += 1
         self.save()
