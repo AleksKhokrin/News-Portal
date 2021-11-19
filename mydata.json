@@ -1,0 +1,158 @@
+[
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2021-11-07T09:06:23.972Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "1",
+    "object_repr": "sport",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2021-11-07T09:06:29.826Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "2",
+    "object_repr": "economic",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2021-11-07T09:06:35.781Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "3",
+    "object_repr": "politic",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2021-11-07T09:06:47.247Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "1",
+    "object_repr": "admin",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2021-11-07T09:07:08.270Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "1",
+    "object_repr": "127.0.0.1",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Domain name\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2021-11-07T09:08:13.376Z",
+    "user": 1,
+    "content_type": 12,
+    "object_id": "1",
+    "object_repr": "Google",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2021-11-07T13:00:37.929Z",
+    "user": 1,
+    "content_type": 3,
+    "object_id": "1",
+    "object_repr": "common",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2021-11-07T13:01:10.062Z",
+    "user": 1,
+    "content_type": 3,
+    "object_id": "2",
+    "object_repr": "authors",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2021-11-07T13:28:36.343Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "2",
+    "object_repr": "anton",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Groups\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2021-11-07T16:09:53.434Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "4",
+    "object_repr": "jiucaneg2015",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2021-11-07T16:18:26.441Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "3",
+    "object_repr": "jiucaneg2012",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2021-11-07T16:26:18.391Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "5",
+    "object_repr": "jiucaneg2012",
+    "action_flag": 3,
+    "change_message": ""
+  }
+}
+]
